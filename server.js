@@ -1,5 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const chalk = require('chalk');
 
 const baseUrl = 'https://tacobell.com';
 const startingUrl = baseUrl + '/food';
@@ -157,16 +158,17 @@ function removeEmptyStringsFromArray(array) {
 }
 
 function printResult(item) {
-  console.log(item.title);
-  printArray(item.removedItems, '-');
-  printArray(item.addons, '+');
-  printArray(item.sauces, '+');
+  console.log(chalk.blue.underline.bold(`\n${item.title}\n`));
+  printArray(item.removedItems, chalk.red, '-');
+  printArray(item.addons, chalk.green, '+');
+  printArray(item.sauces, chalk.green, '+');
+  console.log('\n');
 }
 
-function printArray(arr, append = '') {
+function printArray(arr, chalk, append = '') {
   if (Array.isArray(arr)) {
     arr.forEach(item => {
-      console.log(append + item);
+      console.log(chalk(append + item));
     });
   }
 }
