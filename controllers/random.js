@@ -7,7 +7,7 @@ router.use(function timeLog (req, res, next) {
   next()
 });
 
-router.get('/single', async function (req, res) {
+router.get('/single', async (req, res) => {
   let randomItem;
 
   try {
