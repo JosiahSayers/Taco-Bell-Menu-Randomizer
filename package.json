@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "mon:dev": "nodemon server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "get-frontend": "cp -R ../taco-especial/public public"
   },
   "author": "",
   "license": "ISC",

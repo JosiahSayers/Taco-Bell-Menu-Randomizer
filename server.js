@@ -10,4 +10,8 @@ app.use(bodyParser.json());
 
 app.use('/random', randomRouter);
 
+app.get('/', (req, res) => {
+  res.render('/public/index.html');
+});
+
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
