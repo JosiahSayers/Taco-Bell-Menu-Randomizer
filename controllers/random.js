@@ -13,7 +13,8 @@ router.get('/single', async (req, res) => {
   try {
     randomItem = await randomMenuItem();
     res.json(randomItem);
-  } catch {
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'unknown error' });
   }
 });
