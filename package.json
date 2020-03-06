@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "mon:dev": "nodemon server.js",
+    "mon:dev": "PORT=3000 nodemon server.js",
     "start": "node server.js",
     "get-frontend": "cp -R ../taco-especial/public public"
   },
@@ -20,6 +20,7 @@
     "chalk": "^3.0.0",
     "cheerio": "^1.0.0-rc.3",
     "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1"
   }
 }

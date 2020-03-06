@@ -38,7 +38,9 @@ async function getRandomItem() {
 }
 
 async function getItemCategory() {
+  console.log('ENTERING getItemCategory');
   const response = await axios(startingUrl);
+  console.log('getItemCategory response: ', JSON.stringify(response));
 
   const html = response.data;
   const $ = cheerio.load(html);
