@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const cors = require('cors');
 const randomRouter = require('./controllers/random');
-const port = 3000;
+const port = 80;
 
 app.use(cors());
 app.use(express.static('public'));
