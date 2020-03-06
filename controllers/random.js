@@ -14,7 +14,7 @@ router.get('/single', async (req, res) => {
     randomItem = await randomMenuItem();
     res.json(randomItem);
   } catch {
-    res.statusCode(500);
+    res.status(500).json({ error: 'unknown error' });
   }
 });
 
