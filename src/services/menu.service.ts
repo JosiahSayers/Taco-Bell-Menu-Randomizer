@@ -40,7 +40,7 @@ export async function getMenu(): Promise<Menu> {
             const productInfo = await scraper.getProductInfo(menuItem);
             category.products.push(productInfo);
             return null;
-          } catch {
+          } catch (e) {
             console.error('Error fetching product: ' + menuItem.title, e);
             return null;
           }
@@ -48,7 +48,7 @@ export async function getMenu(): Promise<Menu> {
 
         return null;
 
-      } catch {
+      } catch (e) {
         console.error('Error fetching category: ' + category.title, e);
         return null;
       }
