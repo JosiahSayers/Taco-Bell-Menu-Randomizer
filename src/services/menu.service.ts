@@ -61,7 +61,30 @@ export async function getMenu(): Promise<Menu> {
   return menu;
 }
 
-export async function getRandomItem(): Promise<Product> {
+export async function getRandomItem(menu: Menu): Promise<RandomizedProduct> {
+  if (menu) {
+    console.log('Item returned from cache:');
+    return getRandomItemFromCache(menu);
+  } else {
+    console.log('Item returned from scraper:');
+    return getRandomItemFromScraper();
+  }
+}
+
+function getRandomItemFromCache(menu: Menu): RandomizedProduct {
+  const category = getRandom<Category>(menu.categories);
+  
+  if (!categoriesToSkip.includes(category.title.toLocaleLowerCase())) {
+    const product = getRandom<Product>(category.products);
+    const randomizedItem = randomizeItemContents(product);
+    printResult(randomizedItem);
+    return randomizedItem;
+  } else {
+    return getRandomItemFromCache(menu);
+  }
+}
+
+async function getRandomItemFromScraper(): Promise<RandomizedProduct> {
   const categories = await scraper.getCategories();
   const category = getRandom<Category>(categories);
 
@@ -76,11 +99,11 @@ export async function getRandomItem(): Promise<Product> {
       return randomizedItem;
     } else {
       console.log('Category does not allow customizations! Looking again...');
-      return getRandomItem();
+      return getRandomItemFromScraper();
     }
   } else {
     console.log('Category does not allow customizations! Looking again...');
-    return getRandomItem();
+    return getRandomItemFromScraper();
   }
 }
 
