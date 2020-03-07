@@ -18,10 +18,47 @@ const categoriesToSkip = [
 ];
 
 export async function getMenu(): Promise<Menu> {
-  let menu: Menu;
-
-  menu.categories = await scraper.getCategories();
+  let menu: Menu = {
+    validUntil: new Date(),
+    categories: []
+  };
   
+  menu.validUntil.setHours(menu.validUntil.getHours() + 12);
+
+  try {
+    menu.categories = await scraper.getCategories();
+    await asyncForEach(menu.categories, async (category: Category): Promise<any> => {
+      try {
+        if (!Array.isArray(category.products)) {
+          category.products = [];
+        }
+        const menuItems = await scraper.getMenuItems(category);
+
+        await asyncForEach(menuItems, async (menuItem: MenuItem): Promise<any> => {
+
+          try {
+            const productInfo = await scraper.getProductInfo(menuItem);
+            category.products.push(productInfo);
+            return null;
+          } catch {
+            console.error('Error fetching product: ' + menuItem.title, e);
+            return null;
+          }
+        });
+
+        return null;
+
+      } catch {
+        console.error('Error fetching category: ' + category.title, e);
+        return null;
+      }
+
+    });
+  } catch (e) {
+    console.error('Error fetching Menu!', e);
+  }
+  
+  return menu;
 }
 
 export async function getRandomItem(): Promise<Product> {
@@ -102,5 +139,11 @@ function printArray(arr: any[], chalk: Chalk, append = '') {
     arr.forEach(item => {
       console.log(chalk(append + item));
     });
+  }
+}
+
+async function asyncForEach(array: any[], callback: Function) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
   }
 }

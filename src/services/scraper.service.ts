@@ -13,7 +13,7 @@ export async function getCategories(): Promise<Category[]> {
 
   const html = response.data;
   const $ = cheerio.load(html);
-  const menuItems = $('a.cls-category-card-item').toArray();
+  const menuItems = $('a.cls-category-card-item').toArray() || [];
   const titleItems = $('a.cls-category-card-item > .cls-category-card-item-card > .text > span');
   const categories: Category[] = [];
   
