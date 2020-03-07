@@ -77,8 +77,13 @@ function getRandomItemFromCache(menu: Menu): RandomizedProduct {
   if (!categoriesToSkip.includes(category.title.toLocaleLowerCase())) {
     const product = getRandom<Product>(category.products);
     const randomizedItem = randomizeItemContents(product);
-    printResult(randomizedItem);
-    return randomizedItem;
+    
+    if (!categoriesToSkip.includes(randomizedItem.category)) {
+      printResult(randomizedItem);
+      return randomizedItem;
+    } else {
+      return getRandomItemFromCache(menu);
+    }
   } else {
     return getRandomItemFromCache(menu);
   }
