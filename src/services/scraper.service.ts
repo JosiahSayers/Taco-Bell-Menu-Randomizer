@@ -1,18 +1,21 @@
-const axios = require('axios');
-const cheerio = require('cheerio');
-const chalk = require('chalk');
+import axios from 'axios';
+import cheerio from 'cheerio';
+
+import { Category } from "../types/category.model";
+import { MenuItem } from '../types/menu-item.model';
+import { Product } from '../types/product.model';
 
 const baseUrl = 'https://tacobell.com';
 const startingUrl = baseUrl + '/food';
 
-async function getCategories() {
+export async function getCategories(): Promise<Category[]> {
   const response = await axios(startingUrl);
 
   const html = response.data;
   const $ = cheerio.load(html);
   const menuItems = $('a.cls-category-card-item').toArray();
   const titleItems = $('a.cls-category-card-item > .cls-category-card-item-card > .text > span');
-  const categories = [];
+  const categories: Category[] = [];
   
   menuItems.forEach((item, index) => {
     const href = baseUrl + item.attribs.href;
@@ -23,13 +26,13 @@ async function getCategories() {
   return categories;
 }
 
-async function getMenuItems(categoryObject) {
+export async function getMenuItems(categoryObject: Category): Promise<MenuItem[]> {
   const response = await axios(categoryObject.href);
 
   const html = response.data;
   const $ = cheerio.load(html);
   const productDetailsArray = $('div.product-details > .product-name > a').toArray();
-  const menuItems = [];
+  const menuItems: MenuItem[] = [];
   
   productDetailsArray.forEach(product => {
     const category = product.attribs.href.split('/')[2];
@@ -41,14 +44,14 @@ async function getMenuItems(categoryObject) {
   return menuItems;
 }
 
-async function getProductInfo(menuItem) {
+export async function getProductInfo(menuItem: MenuItem): Promise<Product> {
   const response = await axios(menuItem.href);
   const html = response.data;
   const $ = cheerio.load(html);
-  const productInfo = {
+  const productInfo: Product = {
     title: menuItem.title,
     category: menuItem.category,
-    includedByDefault: [],
+    includedItems: [],
     addons: [],
     sauces: []
   };
@@ -57,18 +60,20 @@ async function getProductInfo(menuItem) {
   const addonsArray = $('[data-group=addons] > ul > li > div.custom-info > span').toArray();
   const saucesArray = $('[data-group=sauces] > ul > li > div.custom-info > span').toArray();
 
-  includedArray.forEach(item => productInfo.includedByDefault.push(item.children[0].data));
+  includedArray.forEach(item => productInfo.includedItems.push(item.children[0].data));
   addonsArray.forEach(addon => productInfo.addons.push(addon.children[0].data));
   saucesArray.forEach(sauce => productInfo.sauces.push(sauce.children[0].data));
 
-  Object.keys(productInfo).forEach(key => productInfo[key] = removeEmptyStringsFromArray(productInfo[key]));
+  productInfo.includedItems = removeEmptyStringsFromArray(productInfo.includedItems);
+  productInfo.addons = removeEmptyStringsFromArray(productInfo.addons);
+  productInfo.sauces = removeEmptyStringsFromArray(productInfo.sauces);
 
   return productInfo;
 }
 
-function removeEmptyStringsFromArray(array) {
+function removeEmptyStringsFromArray(array: string[]) {
   if (Array.isArray(array)) {
-    const outputArray = [];
+    const outputArray: string[] = [];
 
     array.forEach(string => {
       if (string.trim().length > 0) {
@@ -81,9 +86,3 @@ function removeEmptyStringsFromArray(array) {
     return array;
   }
 }
-
-module.exports = {
-  getCategories,
-  getMenuItems,
-  getProductInfo
-};

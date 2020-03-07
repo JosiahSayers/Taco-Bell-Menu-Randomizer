@@ -1,8 +1,10 @@
-const scraper = require('./scraper-service');
-const chalk = require('chalk');
-
-const baseUrl = 'https://tacobell.com';
-const startingUrl = baseUrl + '/food';
+import * as scraper from './scraper.service';
+import { Product } from '../types/product.model';
+import { RandomizedProduct } from '../types/randomized-product.model';
+import chalk, { Chalk } from 'chalk';
+import { Category } from '../types/category.model';
+import { MenuItem } from '../types/menu-item.model';
+import { Menu } from '../types/menu';
 
 const categoriesToSkip = [
   'party packs',
@@ -15,13 +17,20 @@ const categoriesToSkip = [
   'deals-and-combos'
 ];
 
-async function getRandomItem() {
+export async function getMenu(): Promise<Menu> {
+  let menu: Menu;
+
+  menu.categories = await scraper.getCategories();
+  
+}
+
+export async function getRandomItem(): Promise<Product> {
   const categories = await scraper.getCategories();
-  const category = getRandom(categories);
+  const category = getRandom<Category>(categories);
 
   if (!categoriesToSkip.includes(category.title.toLowerCase())) {
     const menuItems = await scraper.getMenuItems(category);
-    const menuItem = getRandom(menuItems);
+    const menuItem = getRandom<MenuItem>(menuItems);
 
     if (!categoriesToSkip.includes(menuItem.category)) {
       const productInfo = await scraper.getProductInfo(menuItem);
@@ -38,8 +47,8 @@ async function getRandomItem() {
   }
 }
 
-async function randomizeItemContents(productInfo) {
-  const randomizedProductInfo = {
+function randomizeItemContents(productInfo: Product): RandomizedProduct {
+  const randomizedProductInfo: RandomizedProduct = {
     title: productInfo.title,
     category: productInfo.category,
     includedItems: [],
@@ -48,7 +57,7 @@ async function randomizeItemContents(productInfo) {
     sauces: []
   };
 
-  productInfo.includedByDefault.forEach(ingredient => {
+  productInfo.includedItems.forEach(ingredient => {
     const randomNumber = Math.random();
     if (randomNumber >= 0.15) {
       randomizedProductInfo.includedItems.push(ingredient);
@@ -74,29 +83,13 @@ async function randomizeItemContents(productInfo) {
   return randomizedProductInfo;
 }
 
-function getRandom(array) {
+function getRandom<T>(array: any[]): T {
   if (Array.isArray(array)) {
     return array[Math.floor(Math.random() * array.length)];
   }
 }
 
-function removeEmptyStringsFromArray(array) {
-  if (Array.isArray(array)) {
-    const outputArray = [];
-
-    array.forEach(string => {
-      if (string.trim().length > 0) {
-        outputArray.push(string);
-      }
-    });
-
-    return outputArray;
-  } else {
-    return array;
-  }
-}
-
-function printResult(item) {
+function printResult(item: RandomizedProduct) {
   console.log(chalk.blue.underline.bold(`\n${item.title}\n`));
   printArray(item.removedItems, chalk.red, '-');
   printArray(item.addons, chalk.green, '+');
@@ -104,12 +97,10 @@ function printResult(item) {
   console.log('\n');
 }
 
-function printArray(arr, chalk, append = '') {
+function printArray(arr: any[], chalk: Chalk, append = '') {
   if (Array.isArray(arr)) {
     arr.forEach(item => {
       console.log(chalk(append + item));
     });
   }
 }
-
-module.exports = getRandomItem;

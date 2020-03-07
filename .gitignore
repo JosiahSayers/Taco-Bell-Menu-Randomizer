@@ -1,4 +1,4 @@
 node_modules
 .env
 Archive.zip
-public
+dist

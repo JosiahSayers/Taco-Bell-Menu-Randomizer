@@ -4,15 +4,24 @@
   "description": "This API will return menu information scraped from the taco bell website",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "mon:dev": "PORT=3000 nodemon server.js",
-    "start": "node server.js",
-    "get-frontend": "cp -R ../taco-especial/public ./"
+    "serve": "node dist/server.js",
+    "build": "npm run build-ts && npm run get-frontend",
+    "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
+    "watch-node": "PORT=3000 nodemon dist/server.js",
+    "start": "npm run serve",
+    "get-frontend": "cp -R ../taco-especial/public ./",
+    "build-ts": "tsc",
+    "watch-ts": "tsc -w"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^2.0.2"
+    "@types/cheerio": "^0.22.16",
+    "@types/cors": "^2.8.6",
+    "@types/express": "^4.17.3",
+    "concurrently": "^5.1.0",
+    "nodemon": "^2.0.2",
+    "typescript": "^3.8.3"
   },
   "dependencies": {
     "axios": "^0.19.2",
@@ -21,6 +30,7 @@
     "cheerio": "^1.0.0-rc.3",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "node-cache": "^5.1.0"
   }
 }
