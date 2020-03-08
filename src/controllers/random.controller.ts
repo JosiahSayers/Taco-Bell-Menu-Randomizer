@@ -43,7 +43,8 @@ router.get('/single', async (req, res) => {
   let randomItem: Product;
 
   try {
-    randomItem = await getRandomItem(req.cache.get(CACHE_KEYS.MENU));
+    const params = new RandomItemParams({});
+    randomItem = await getRandomItem(req.cache.get(CACHE_KEYS.MENU), params);
     res.json(randomItem);
   } catch (error) {
     console.error(error);
