@@ -2,31 +2,33 @@ import { Menu } from "../types/menu";
 import fs from 'fs';
 
 export function getAllPossibleValues(menu: Menu) {
-  if (!doesFileAlreadyExist()) {
-    const possibleItems = {
-      categories: [] as string[],
-      products: [] as string[],
-      addons: [] as string[],
-      sauces: [] as string[]
-    }
+  if (menu) {
+    if (!doesFileAlreadyExist()) {
+      const possibleItems = {
+        categories: [] as string[],
+        products: [] as string[],
+        addons: [] as string[],
+        sauces: [] as string[]
+      }
 
-    menu.categories.forEach((category) => {
-      possibleItems.categories = addItemIfNew(possibleItems.categories, category.title);
+      menu.categories.forEach((category) => {
+        possibleItems.categories = addItemIfNew(possibleItems.categories, category.title);
 
-      category.products.forEach((product) => {
-        possibleItems.products = addItemIfNew(possibleItems.products, product.title);
+        category.products.forEach((product) => {
+          possibleItems.products = addItemIfNew(possibleItems.products, product.title);
 
-        product.addons.forEach((addon) => {
-          possibleItems.addons = addItemIfNew(possibleItems.addons, addon);
-        });
+          product.addons.forEach((addon) => {
+            possibleItems.addons = addItemIfNew(possibleItems.addons, addon);
+          });
 
-        product.sauces.forEach((sauce) => {
-          possibleItems.sauces = addItemIfNew(possibleItems.sauces, sauce);
+          product.sauces.forEach((sauce) => {
+            possibleItems.sauces = addItemIfNew(possibleItems.sauces, sauce);
+          });
         });
       });
-    });
 
-    fs.writeFileSync('./menu-possibilites.json', JSON.stringify(possibleItems), { encoding: 'utf8' });
+      fs.writeFileSync('./menu-possibilites.json', JSON.stringify(possibleItems), { encoding: 'utf8' });
+    }
   }
 }
 
