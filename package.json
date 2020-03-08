@@ -13,7 +13,8 @@
     "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve-debug\"",
     "get-frontend": "cp -R ../taco-especial/public ./",
     "build-ts": "tsc",
-    "watch-ts": "tsc -w"
+    "watch-ts": "tsc -w",
+    "forever": "sudo PORT=80 forever start dist/server.js"
   },
   "author": "",
   "license": "ISC",
