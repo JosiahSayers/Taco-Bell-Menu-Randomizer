@@ -5,6 +5,7 @@ import chalk, { Chalk } from 'chalk';
 import { Category } from '../types/category.model';
 import { MenuItem } from '../types/menu-item.model';
 import { Menu } from '../types/menu';
+import { RandomItemParams } from '../types/random-item-params.model';
 
 const categoriesToSkip = [
   'party packs',
@@ -61,22 +62,31 @@ export async function getMenu(): Promise<Menu> {
   return menu;
 }
 
-export async function getRandomItem(menu: Menu): Promise<RandomizedProduct> {
+export async function getRandomItem(menu: Menu, options?: RandomItemParams): Promise<RandomizedProduct> {
   if (menu) {
     console.log('Item returned from cache:');
-    return getRandomItemFromCache(menu);
+    return getRandomItemFromCache(menu, options);
   } else {
     console.log('Item returned from scraper:');
-    return getRandomItemFromScraper();
+    return getRandomItemFromScraper(options);
   }
 }
 
-function getRandomItemFromCache(menu: Menu): RandomizedProduct {
-  const category = getRandom<Category>(menu.categories);
+function getRandomItemFromCache(menu: Menu, options?: RandomItemParams): RandomizedProduct {
+  let category: Category;
+
+  if (options?.categories && options?.categories?.length > 0) {
+    const filteredCategories = menu.categories.filter((cat) => options.categories.includes(cat.title));
+    console.log(filteredCategories);
+    category = getRandom<Category>(filteredCategories);
+    console.log(JSON.stringify(category));
+  } else {
+    category = getRandom<Category>(menu.categories);
+  }
   
   if (!categoriesToSkip.includes(category.title.toLocaleLowerCase())) {
     const product = getRandom<Product>(category.products);
-    const randomizedItem = randomizeItemContents(product);
+    const randomizedItem = randomizeItemContents(product, options);
     
     if (!categoriesToSkip.includes(randomizedItem.category)) {
       printResult(randomizedItem);
@@ -89,7 +99,7 @@ function getRandomItemFromCache(menu: Menu): RandomizedProduct {
   }
 }
 
-async function getRandomItemFromScraper(): Promise<RandomizedProduct> {
+async function getRandomItemFromScraper(options?: RandomItemParams): Promise<RandomizedProduct> {
   const categories = await scraper.getCategories();
   const category = getRandom<Category>(categories);
 
@@ -99,20 +109,18 @@ async function getRandomItemFromScraper(): Promise<RandomizedProduct> {
 
     if (!categoriesToSkip.includes(menuItem.category)) {
       const productInfo = await scraper.getProductInfo(menuItem);
-      const randomizedItem = await randomizeItemContents(productInfo);
+      const randomizedItem = await randomizeItemContents(productInfo, options);
       printResult(randomizedItem);
       return randomizedItem;
     } else {
-      console.log('Category does not allow customizations! Looking again...');
       return getRandomItemFromScraper();
     }
   } else {
-    console.log('Category does not allow customizations! Looking again...');
     return getRandomItemFromScraper();
   }
 }
 
-function randomizeItemContents(productInfo: Product): RandomizedProduct {
+function randomizeItemContents(productInfo: Product, options?: RandomItemParams): RandomizedProduct {
   const randomizedProductInfo: RandomizedProduct = {
     title: productInfo.title,
     category: productInfo.category,
@@ -122,25 +130,40 @@ function randomizeItemContents(productInfo: Product): RandomizedProduct {
     sauces: []
   };
 
-  productInfo.includedItems.forEach(ingredient => {
-    const randomNumber = Math.random();
-    if (randomNumber >= 0.15) {
-      randomizedProductInfo.includedItems.push(ingredient);
-    } else {
-      randomizedProductInfo.removedItems.push(ingredient);
-    }
-  });
+  if (options?.allowItemRemoval) {
+    productInfo.includedItems.forEach(ingredient => {
+      const randomNumber = Math.random();
+      if (randomNumber >= 0.15) {
+        randomizedProductInfo.includedItems.push(ingredient);
+      } else {
+        randomizedProductInfo.removedItems.push(ingredient);
+      }
+    });
+  } else {
+    randomizedProductInfo.includedItems = Array.from(productInfo.includedItems);
+  }
 
   productInfo.addons.forEach(addon => {
     const randomNumber = Math.random();
-    if (randomNumber <= 0.20) {
+    if ((randomNumber <= 0.20 && !options?.excludeAddons.includes(addon)) ||
+        options?.alwaysIncludeAddons.includes(addon)) {
       randomizedProductInfo.addons.push(addon);
     }
   });
 
   productInfo.sauces.forEach(sauce => {
+    const maxNumberOfSauces = options?.maxNumberOfSauces ?? 2;
     const randomNumber = Math.random();
-    if (randomNumber <= 0.20 && randomizedProductInfo.sauces.length < 2) {
+
+    if (options?.alwaysInclueSauces.includes(sauce)) {
+      if (randomizedProductInfo.sauces.length >= maxNumberOfSauces) {
+        const randomIndexToRemove = Math.floor(Math.random() * maxNumberOfSauces);
+        randomizedProductInfo.sauces.splice(randomIndexToRemove, 1);
+      }
+      randomizedProductInfo.sauces.push(sauce);
+    } else if (randomNumber <= 0.20
+        && randomizedProductInfo.sauces.length < maxNumberOfSauces
+        && !options?.excludeSauces.includes(sauce)) {
       randomizedProductInfo.sauces.push(sauce);
     }
   });

@@ -1,9 +1,10 @@
 import express from 'express';
-import { getRandomItem, getMenu } from '../services/menu.service';
+import { getRandomItem } from '../services/menu.service';
 import { Product } from '../types/product.model';
 import { CACHE_KEYS } from '../constants/cache-keys';
 import { Menu } from '../types/menu';
 import { updateCachedMenu } from '../services/cache.service';
+import { RandomItemParams } from '../types/random-item-params.model';
 
 const router = express.Router();
 
@@ -43,6 +44,19 @@ router.get('/single', async (req, res) => {
 
   try {
     randomItem = await getRandomItem(req.cache.get(CACHE_KEYS.MENU));
+    res.json(randomItem);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'unknown error' });
+  }
+});
+
+router.post('/single', async (req, res) => {
+  let randomItem: Product;
+
+  try {
+    const params = new RandomItemParams(req.body);
+    randomItem = await getRandomItem(req.cache.get(CACHE_KEYS.MENU), params);
     res.json(randomItem);
   } catch (error) {
     console.error(error);

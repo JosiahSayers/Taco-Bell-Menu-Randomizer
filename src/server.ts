@@ -6,11 +6,13 @@ import NodeCache from 'node-cache';
 import randomRouter from './controllers/random.controller';
 import { CACHE_KEYS } from './constants/cache-keys';
 import { getValidMenuFromDisk } from './services/cache.service';
+import { getAllPossibleValues } from './services/menu-helper.service';
 
 const app = express();
 const port = process.env.PORT;
 const _cache = new NodeCache();
 _cache.set(CACHE_KEYS.MENU, getValidMenuFromDisk());
+getAllPossibleValues(_cache.get(CACHE_KEYS.MENU));
 
 const injectCache = (req: Express.Request, res: Express.Response, next: Function) => {
   req.cache = _cache;
