@@ -145,8 +145,7 @@ function randomizeItemContents(productInfo: Product, options?: RandomItemParams)
 
   productInfo.addons.forEach(addon => {
     const randomNumber = Math.random();
-    if ((randomNumber <= 0.20 && !includesCaseInsensitve(options?.excludeAddons, addon)) ||
-      includesCaseInsensitve(options?.alwaysIncludeAddons, addon)) {
+    if (randomNumber <= 0.20 && includesCaseInsensitve(options?.alwaysIncludeAddons, addon)) {
       randomizedProductInfo.addons.push(addon);
     }
   });
@@ -155,15 +154,9 @@ function randomizeItemContents(productInfo: Product, options?: RandomItemParams)
     const maxNumberOfSauces = options?.maxNumberOfSauces ?? 2;
     const randomNumber = Math.random();
 
-    if (includesCaseInsensitve(options?.alwaysIncludeSauces, sauce)) {
-      if (randomizedProductInfo.sauces.length >= maxNumberOfSauces) {
-        const randomIndexToRemove = Math.floor(Math.random() * maxNumberOfSauces);
-        randomizedProductInfo.sauces.splice(randomIndexToRemove, 1);
-      }
-      randomizedProductInfo.sauces.push(sauce);
-    } else if (randomNumber <= 0.20
+    if (randomNumber <= 0.20
         && randomizedProductInfo.sauces.length < maxNumberOfSauces
-        && !includesCaseInsensitve(options?.excludeSauces, sauce)) {
+        && includesCaseInsensitve(options?.alwaysIncludeSauces, sauce)) {
       randomizedProductInfo.sauces.push(sauce);
     }
   });
