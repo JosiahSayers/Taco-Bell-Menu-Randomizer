@@ -39,6 +39,10 @@ function addItemIfNew(arr: string[], newItem: string): string[] {
 }
 
 function doesFileAlreadyExist(): boolean {
-  const file = fs.readFileSync('./menu-possibilites.json', { encoding: 'utf8' });
-  return !!file;
+  try {
+    const file = fs.readFileSync('./menu-possibilites.json', { encoding: 'utf8' });
+    return !!file;
+  } catch {
+    return false;
+  }
 }
