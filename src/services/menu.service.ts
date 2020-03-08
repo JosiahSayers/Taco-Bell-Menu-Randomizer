@@ -75,7 +75,7 @@ export async function getRandomItem(menu: Menu, options?: RandomItemParams): Pro
 function getRandomItemFromCache(menu: Menu, options?: RandomItemParams): RandomizedProduct {
   let category: Category;
 
-  if (options?.categories && options?.categories?.length > 0) {
+  if (options?.categories?.length > 0) {
     const filteredCategories = menu.categories.filter((cat) => options.categories.includes(cat.title));
     console.log(filteredCategories);
     category = getRandom<Category>(filteredCategories);
@@ -84,7 +84,7 @@ function getRandomItemFromCache(menu: Menu, options?: RandomItemParams): Randomi
     category = getRandom<Category>(menu.categories);
   }
   
-  if (!categoriesToSkip.includes(category.title.toLocaleLowerCase())) {
+  if (!categoriesToSkip.includes(category.title.toLowerCase())) {
     const product = getRandom<Product>(category.products);
     const randomizedItem = randomizeItemContents(product, options);
     
