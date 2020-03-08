@@ -76,7 +76,7 @@ function getRandomItemFromCache(menu: Menu, options?: RandomItemParams): Randomi
   let category: Category;
 
   if (options?.categories?.length > 0) {
-    const filteredCategories = menu.categories.filter((cat) => options.categories.includes(cat.title));
+    const filteredCategories = menu.categories.filter((cat) => includesCaseInsensitve(options.categories, cat.title));
     console.log(filteredCategories);
     category = getRandom<Category>(filteredCategories);
     console.log(JSON.stringify(category));
@@ -84,11 +84,11 @@ function getRandomItemFromCache(menu: Menu, options?: RandomItemParams): Randomi
     category = getRandom<Category>(menu.categories);
   }
   
-  if (!categoriesToSkip.includes(category.title.toLowerCase())) {
+  if (!includesCaseInsensitve(categoriesToSkip, category.title)) {
     const product = getRandom<Product>(category.products);
     const randomizedItem = randomizeItemContents(product, options);
     
-    if (!categoriesToSkip.includes(randomizedItem.category)) {
+    if (!includesCaseInsensitve(categoriesToSkip, randomizedItem.category)) {
       printResult(randomizedItem);
       return randomizedItem;
     } else {
@@ -103,11 +103,11 @@ async function getRandomItemFromScraper(options?: RandomItemParams): Promise<Ran
   const categories = await scraper.getCategories();
   const category = getRandom<Category>(categories);
 
-  if (!categoriesToSkip.includes(category.title.toLowerCase())) {
+  if (!includesCaseInsensitve(categoriesToSkip, category.title)) {
     const menuItems = await scraper.getMenuItems(category);
     const menuItem = getRandom<MenuItem>(menuItems);
 
-    if (!categoriesToSkip.includes(menuItem.category)) {
+    if (!includesCaseInsensitve(categoriesToSkip, menuItem.category)) {
       const productInfo = await scraper.getProductInfo(menuItem);
       const randomizedItem = await randomizeItemContents(productInfo, options);
       printResult(randomizedItem);
@@ -145,8 +145,8 @@ function randomizeItemContents(productInfo: Product, options?: RandomItemParams)
 
   productInfo.addons.forEach(addon => {
     const randomNumber = Math.random();
-    if ((randomNumber <= 0.20 && !options?.excludeAddons.includes(addon)) ||
-        options?.alwaysIncludeAddons.includes(addon)) {
+    if ((randomNumber <= 0.20 && !includesCaseInsensitve(options?.excludeAddons, addon)) ||
+      includesCaseInsensitve(options?.alwaysIncludeAddons, addon)) {
       randomizedProductInfo.addons.push(addon);
     }
   });
@@ -155,7 +155,7 @@ function randomizeItemContents(productInfo: Product, options?: RandomItemParams)
     const maxNumberOfSauces = options?.maxNumberOfSauces ?? 2;
     const randomNumber = Math.random();
 
-    if (options?.alwaysInclueSauces.includes(sauce)) {
+    if (includesCaseInsensitve(options?.alwaysIncludeSauces, sauce)) {
       if (randomizedProductInfo.sauces.length >= maxNumberOfSauces) {
         const randomIndexToRemove = Math.floor(Math.random() * maxNumberOfSauces);
         randomizedProductInfo.sauces.splice(randomIndexToRemove, 1);
@@ -163,7 +163,7 @@ function randomizeItemContents(productInfo: Product, options?: RandomItemParams)
       randomizedProductInfo.sauces.push(sauce);
     } else if (randomNumber <= 0.20
         && randomizedProductInfo.sauces.length < maxNumberOfSauces
-        && !options?.excludeSauces.includes(sauce)) {
+        && !includesCaseInsensitve(options?.excludeSauces, sauce)) {
       randomizedProductInfo.sauces.push(sauce);
     }
   });
@@ -197,4 +197,20 @@ async function asyncForEach(array: any[], callback: Function) {
   for (let index = 0; index < array.length; index++) {
     await callback(array[index], index, array);
   }
+}
+
+function includesCaseInsensitve(array: string[], str: string): boolean {
+  let found = false;
+  if (Array.isArray(array)) {
+    for (let i=0; i<array.length && !found; i++) {
+      found = stringCompare(array[i], str);
+    }
+  }
+  return found;
+}
+
+function stringCompare(a: string, b: string) {
+  return typeof a === 'string' && typeof b === 'string'
+      ? a.localeCompare(b, undefined, { sensitivity: 'accent' }) === 0
+      : a === b;
 }
