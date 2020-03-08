@@ -18,7 +18,7 @@ router.use((req, res, next) => {
   const currentlyUpdatingMenu = req.cache.get(CACHE_KEYS.CURRENTLY_UPDATING_MENU);
 
   if (menu && menu.validUntil) {
-    if (new Date() >= menu.validUntil) {
+    if (new Date() >= new Date(menu.validUntil)) {
       if (currentlyUpdatingMenu) {
         console.log('Menu is already being updated, skipping update call');
       } else {
