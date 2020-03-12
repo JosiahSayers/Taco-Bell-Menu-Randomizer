@@ -145,7 +145,15 @@ function randomizeItemContents(productInfo: Product, options?: RandomItemParams)
 
   productInfo.addons.forEach(addon => {
     const randomNumber = Math.random();
-    if (randomNumber <= 0.20 && includesCaseInsensitve(options?.alwaysIncludeAddons, addon)) {
+    let shouldPushAddon = false;
+
+    if (options?.alwaysIncludeAddons.length > 0) {
+      shouldPushAddon = includesCaseInsensitve(options?.alwaysIncludeAddons, addon) && randomNumber <= 0.20;
+    } else {
+      shouldPushAddon = randomNumber <= 0.20;
+    }
+
+    if (shouldPushAddon) {
       randomizedProductInfo.addons.push(addon);
     }
   });
@@ -153,10 +161,17 @@ function randomizeItemContents(productInfo: Product, options?: RandomItemParams)
   productInfo.sauces.forEach(sauce => {
     const maxNumberOfSauces = options?.maxNumberOfSauces ?? 2;
     const randomNumber = Math.random();
+    let shouldPushAddon = false;
 
-    if (randomNumber <= 0.20
-        && randomizedProductInfo.sauces.length < maxNumberOfSauces
-        && includesCaseInsensitve(options?.alwaysIncludeSauces, sauce)) {
+    if (randomizedProductInfo.sauces.length < maxNumberOfSauces) {
+      if (options?.alwaysIncludeSauces.length > 0) {
+        shouldPushAddon = includesCaseInsensitve(options?.alwaysIncludeSauces, sauce) && randomNumber <= 0.20;
+      } else {
+        shouldPushAddon = randomNumber <= 0.20;
+      }
+    }
+
+    if (shouldPushAddon) {
       randomizedProductInfo.sauces.push(sauce);
     }
   });
@@ -167,6 +182,8 @@ function randomizeItemContents(productInfo: Product, options?: RandomItemParams)
 function getRandom<T>(array: any[]): T {
   if (Array.isArray(array)) {
     return array[Math.floor(Math.random() * array.length)];
+  } else {
+    return array;
   }
 }
 
