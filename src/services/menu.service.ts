@@ -1,7 +1,6 @@
 import * as scraper from './scraper.service';
 import { Product } from '../types/product.model';
 import { RandomizedProduct } from '../types/randomized-product.model';
-import chalk, { Chalk } from 'chalk';
 import { Category } from '../types/category.model';
 import { MenuItem } from '../types/menu-item.model';
 import { Menu } from '../types/menu';
@@ -23,7 +22,7 @@ export async function getMenu(): Promise<Menu> {
     validUntil: new Date(),
     categories: []
   };
-  
+
   menu.validUntil.setHours(menu.validUntil.getHours() + 12);
 
   try {
@@ -58,16 +57,14 @@ export async function getMenu(): Promise<Menu> {
   } catch (e) {
     console.error('Error fetching Menu!', e);
   }
-  
+
   return menu;
 }
 
 export async function getRandomItem(menu: Menu, options?: RandomItemParams): Promise<RandomizedProduct> {
   if (menu) {
-    console.log('Item returned from cache:');
     return getRandomItemFromCache(menu, options);
   } else {
-    console.log('Item returned from scraper:');
     return getRandomItemFromScraper(options);
   }
 }
@@ -77,19 +74,16 @@ function getRandomItemFromCache(menu: Menu, options?: RandomItemParams): Randomi
 
   if (options?.categories?.length > 0) {
     const filteredCategories = menu.categories.filter((cat) => includesCaseInsensitve(options.categories, cat.title));
-    console.log(filteredCategories);
     category = getRandom<Category>(filteredCategories);
-    console.log(JSON.stringify(category));
   } else {
     category = getRandom<Category>(menu.categories);
   }
-  
+
   if (!includesCaseInsensitve(categoriesToSkip, category.title)) {
     const product = getRandom<Product>(category.products);
     const randomizedItem = randomizeItemContents(product, options);
-    
+
     if (!includesCaseInsensitve(categoriesToSkip, randomizedItem.category)) {
-      printResult(randomizedItem);
       return randomizedItem;
     } else {
       return getRandomItemFromCache(menu);
@@ -110,7 +104,6 @@ async function getRandomItemFromScraper(options?: RandomItemParams): Promise<Ran
     if (!includesCaseInsensitve(categoriesToSkip, menuItem.category)) {
       const productInfo = await scraper.getProductInfo(menuItem);
       const randomizedItem = await randomizeItemContents(productInfo, options);
-      printResult(randomizedItem);
       return randomizedItem;
     } else {
       return getRandomItemFromScraper();
@@ -187,22 +180,6 @@ function getRandom<T>(array: any[]): T {
   }
 }
 
-function printResult(item: RandomizedProduct) {
-  console.log(chalk.blue.underline.bold(`\n${item.title}\n`));
-  printArray(item.removedItems, chalk.red, '-');
-  printArray(item.addons, chalk.green, '+');
-  printArray(item.sauces, chalk.green, '+');
-  console.log('\n');
-}
-
-function printArray(arr: any[], chalk: Chalk, append = '') {
-  if (Array.isArray(arr)) {
-    arr.forEach(item => {
-      console.log(chalk(append + item));
-    });
-  }
-}
-
 async function asyncForEach(array: any[], callback: Function) {
   for (let index = 0; index < array.length; index++) {
     await callback(array[index], index, array);
@@ -212,7 +189,7 @@ async function asyncForEach(array: any[], callback: Function) {
 function includesCaseInsensitve(array: string[], str: string): boolean {
   let found = false;
   if (Array.isArray(array)) {
-    for (let i=0; i<array.length && !found; i++) {
+    for (let i = 0; i < array.length && !found; i++) {
       found = stringCompare(array[i], str);
     }
   }
@@ -221,6 +198,6 @@ function includesCaseInsensitve(array: string[], str: string): boolean {
 
 function stringCompare(a: string, b: string) {
   return typeof a === 'string' && typeof b === 'string'
-      ? a.localeCompare(b, undefined, { sensitivity: 'accent' }) === 0
-      : a === b;
+    ? a.localeCompare(b, undefined, { sensitivity: 'accent' }) === 0
+    : a === b;
 }
