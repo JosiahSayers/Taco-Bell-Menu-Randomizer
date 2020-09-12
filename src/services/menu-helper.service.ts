@@ -1,34 +1,34 @@
 import { Menu } from "../types/menu";
 import fs from 'fs';
 
-export function getAllPossibleValues(menu: Menu, refresh = false) {
+export function getAllPossibleValues(menu: Menu, refresh = false): PossibleItems {
   if (menu) {
-    if (!doesFileAlreadyExist() || refresh) {
-      const possibleItems = {
-        categories: [] as string[],
-        products: [] as string[],
-        addons: [] as string[],
-        sauces: [] as string[]
-      }
+    const possibleItems: PossibleItems = {
+      categories: [],
+      products: [],
+      addons: [],
+      sauces: []
+    }
 
-      menu.categories.forEach((category) => {
-        possibleItems.categories = addItemIfNew(possibleItems.categories, category.title);
+    menu.categories.forEach((category) => {
+      possibleItems.categories = addItemIfNew(possibleItems.categories, category.title);
 
-        category.products.forEach((product) => {
-          possibleItems.products = addItemIfNew(possibleItems.products, product.title);
+      category.products.forEach((product) => {
+        possibleItems.products = addItemIfNew(possibleItems.products, product.title);
 
-          product.addons.forEach((addon) => {
-            possibleItems.addons = addItemIfNew(possibleItems.addons, addon);
-          });
+        product.addons.forEach((addon) => {
+          possibleItems.addons = addItemIfNew(possibleItems.addons, addon);
+        });
 
-          product.sauces.forEach((sauce) => {
-            possibleItems.sauces = addItemIfNew(possibleItems.sauces, sauce);
-          });
+        product.sauces.forEach((sauce) => {
+          possibleItems.sauces = addItemIfNew(possibleItems.sauces, sauce);
         });
       });
-
+    });
+    if (!doesFileAlreadyExist() || refresh) {
       fs.writeFileSync('./menu-possibilites.json', JSON.stringify(possibleItems), { encoding: 'utf8' });
     }
+    return possibleItems;
   }
 }
 
@@ -47,4 +47,11 @@ function doesFileAlreadyExist(): boolean {
   } catch {
     return false;
   }
+}
+
+export interface PossibleItems {
+  categories: string[],
+  products: string[],
+  addons: string[],
+  sauces: string[]
 }

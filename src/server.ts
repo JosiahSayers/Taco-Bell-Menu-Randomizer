@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 import randomRouter from './controllers/random.controller';
+import menuRouter from './controllers/menu.controller';
 import { CACHE_KEYS } from './constants/cache-keys';
 import { getValidMenuFromDisk } from './services/cache.service';
 import { getAllPossibleValues } from './services/menu-helper.service';
@@ -18,7 +19,7 @@ const port = process.env.PORT;
 const MONGO_CONNECTION_STRING = process.env.MONGO_CONNECTION_STRING;
 const _cache = new NodeCache();
 _cache.set(CACHE_KEYS.MENU, getValidMenuFromDisk());
-getAllPossibleValues(_cache.get(CACHE_KEYS.MENU));
+_cache.set(CACHE_KEYS.MENU_POSSIBILITIES, getAllPossibleValues(_cache.get(CACHE_KEYS.MENU)));
 
 const injectCache = (req: Express.Request, res: Express.Response, next: Function) => {
   req.cache = _cache;
@@ -55,5 +56,6 @@ app.use(express.static('public'));
 app.use(bodyParser.json());
 
 app.use('/random', randomRouter);
+app.use('/menu', menuRouter)
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
