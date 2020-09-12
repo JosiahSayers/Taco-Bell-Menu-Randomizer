@@ -1,9 +1,9 @@
 import { Menu } from "../types/menu";
 import fs from 'fs';
 
-export function getAllPossibleValues(menu: Menu) {
+export function getAllPossibleValues(menu: Menu, refresh = false) {
   if (menu) {
-    if (!doesFileAlreadyExist()) {
+    if (!doesFileAlreadyExist() || refresh) {
       const possibleItems = {
         categories: [] as string[],
         products: [] as string[],

@@ -3,19 +3,24 @@ import { CACHE_KEYS } from "../constants/cache-keys";
 import { getMenu } from "./menu.service";
 import { Menu } from "../types/menu";
 import fs from 'fs';
+import { getAllPossibleValues } from './menu-helper.service';
+import { Logger } from './logger.service';
 
 const menuFilepath = './cache.json';
 
 export async function updateCachedMenu(cache: NodeCache) {
+  Logger.startTimerFor('MENU UPDATE');
   cache.set(CACHE_KEYS.CURRENTLY_UPDATING_MENU, true);
 
   const menu = await getMenu();
 
   cache.set(CACHE_KEYS.MENU, menu);
   writeMenuToDisk(menu);
+  getAllPossibleValues(menu, true);
 
   cache.set(CACHE_KEYS.CURRENTLY_UPDATING_MENU, false);
   cache.set(CACHE_KEYS.IS_CACHED_MENU_VALID, true);
+  Logger.finishTimerFor('MENU UPDATE');
 }
 
 function writeMenuToDisk(menu: Menu) {

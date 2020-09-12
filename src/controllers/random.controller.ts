@@ -27,7 +27,9 @@ router.use((req, res, next) => {
 
   if (menu && menu.validUntil) {
     if (new Date() >= new Date(menu.validUntil)) {
+      console.log('OUT OF DATE');
       if (!currentlyUpdatingMenu) {
+        console.log('UPDATING')
         updateCachedMenu(req.cache);
       }
     }
