@@ -13,6 +13,7 @@ function error(message: string, hostname: string, json?: object): void {
 
 function startTimerFor(timerName: string): void {
   runningTimers[timerName] = { startTime: new Date().getTime() };
+  sendLogToDatabase(`Timer started for ${timerName}`, {}, 'info');
 }
 
 function finishTimerFor(timerName: string): void {

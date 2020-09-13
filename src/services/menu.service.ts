@@ -5,6 +5,7 @@ import { Category } from '../types/category.model';
 import { MenuItem } from '../types/menu-item.model';
 import { Menu } from '../types/menu';
 import { RandomItemParams } from '../types/random-item-params.model';
+import { Logger } from './logger.service';
 
 const categoriesToSkip = [
   'party packs',
@@ -41,7 +42,7 @@ export async function getMenu(): Promise<Menu> {
             category.products.push(productInfo);
             return null;
           } catch (e) {
-            console.error('Error fetching product: ' + menuItem.title, e);
+            Logger.error(`Error fetching product (${menuItem.title}) during menu update`, undefined, e);
             return null;
           }
         });
@@ -49,13 +50,13 @@ export async function getMenu(): Promise<Menu> {
         return null;
 
       } catch (e) {
-        console.error('Error fetching category: ' + category.title, e);
+        Logger.error(`Error fetching category (${category.title}) during menu update`, undefined, e);
         return null;
       }
 
     });
   } catch (e) {
-    console.error('Error fetching Menu!', e);
+    Logger.error('Error fetching Menu!', undefined, e);
   }
 
   return menu;

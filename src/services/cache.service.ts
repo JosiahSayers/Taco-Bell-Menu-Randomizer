@@ -25,7 +25,11 @@ export async function updateCachedMenu(cache: NodeCache) {
 }
 
 function writeMenuToDisk(menu: Menu) {
-  fs.writeFileSync(menuFilepath, JSON.stringify(menu), { encoding: 'utf8' });
+  try {
+    fs.writeFileSync(menuFilepath, JSON.stringify(menu), { encoding: 'utf8' });
+  } catch (e) {
+    Logger.error('Error writing menu to disk', undefined, e);
+  }
 }
 
 export function getValidMenuFromDisk(): Menu {
@@ -34,6 +38,7 @@ export function getValidMenuFromDisk(): Menu {
     const menu: Menu = JSON.parse(menuString);
     return menu;
   } catch (e) {
+    Logger.error('Error reading menu from disk', undefined, e);
     return null;
   }
 }
@@ -44,6 +49,7 @@ export function getMenuPossibilitiesFromDisk(): PossibleItems {
     const possibleItems = JSON.parse(asString);
     return possibleItems;
   } catch (e) {
+    Logger.error('Error reading menu possibilites from disk', undefined, e);
     return null;
   }
 }

@@ -1,5 +1,6 @@
 import { Menu } from "../types/menu";
 import fs from 'fs';
+import { Logger } from './logger.service';
 
 export function getAllPossibleValues(menu: Menu, refresh = false): PossibleItems {
   if (menu) {
@@ -25,9 +26,15 @@ export function getAllPossibleValues(menu: Menu, refresh = false): PossibleItems
         });
       });
     });
+
     if (!doesFileAlreadyExist() || refresh) {
-      fs.writeFileSync('./menu-possibilites.json', JSON.stringify(possibleItems), { encoding: 'utf8' });
+      try {
+        fs.writeFileSync('./menu-possibilites.json', JSON.stringify(possibleItems), { encoding: 'utf8' });
+      } catch (e) {
+        Logger.error('Error writing menu possibilites to disk', undefined, e);
+      }
     }
+
     return possibleItems;
   }
 }
@@ -44,7 +51,8 @@ function doesFileAlreadyExist(): boolean {
   try {
     const file = fs.readFileSync('./menu-possibilites.json', { encoding: 'utf8' });
     return !!file;
-  } catch {
+  } catch (e) {
+    Logger.error('Error reading menu possibilities from disk', undefined, e);
     return false;
   }
 }
