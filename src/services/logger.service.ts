@@ -4,11 +4,11 @@ const runningTimers: { [timerName: string]: { startTime: number } } = {};
 const logToConsole = () => process.env.LOG_TO_CONSOLE === 'true';
 
 function info(message: string, hostname: string, json?: object): void {
-  sendLogToDatabase(message || '', json || {}, 'info');
+  sendLogToDatabase(message || '', json || {}, 'info', hostname);
 }
 
 function error(message: string, hostname: string, json?: object): void {
-  sendLogToDatabase(message || '', json || {}, 'error');
+  sendLogToDatabase(message || '', json || {}, 'error', hostname);
 }
 
 function startTimerFor(timerName: string): void {
@@ -38,12 +38,13 @@ function finishTimerFor(timerName: string): void {
   }
 }
 
-function sendLogToDatabase(message: string, json: object, level: string): void {
+function sendLogToDatabase(message: string, json: object, level: string, hostname?: string): void {
   const logStatement = {
     time: new Date().toISOString(),
     message,
     json,
-    level
+    level,
+    hostname
   };
 
   LogStatement.create(logStatement);
