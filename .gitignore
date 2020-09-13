@@ -3,3 +3,4 @@ node_modules
 Archive.zip
 dist
 public
+.DS_Store

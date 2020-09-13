@@ -5,14 +5,14 @@ export type LogStatementDocument = mongoose.Document & LogStatementInterface;
 export interface LogStatementInterface {
   time: string;
   message: string;
-  stringifiedLog: string;
+  json: object;
   level: string;
 }
 
 const logStatementSchema = new mongoose.Schema({
   time: String,
   message: { type: String, text: true },
-  stringifiedLog: String,
+  json: Object,
   level: String
 });
 

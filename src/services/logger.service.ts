@@ -42,7 +42,7 @@ function sendLogToDatabase(message: string, json: object, level: string): void {
   const logStatement = {
     time: new Date().toISOString(),
     message,
-    stringifiedLog: JSON.stringify(json),
+    json,
     level
   };
 
