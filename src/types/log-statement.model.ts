@@ -7,13 +7,15 @@ export interface LogStatementInterface {
   message: string;
   json: object;
   level: string;
+  hostname: string;
 }
 
 const logStatementSchema = new mongoose.Schema({
   time: String,
   message: { type: String, text: true },
   json: Object,
-  level: String
+  level: String,
+  hostname: String
 });
 
 export const LogStatement = mongoose.model<LogStatementDocument>('logging', logStatementSchema);
