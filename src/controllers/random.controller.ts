@@ -12,6 +12,7 @@ const router = express.Router();
 router.use(function timeLog(req: Request, res, next) {
   Logger.info(
     'Random item request',
+    req.hostname,
     {
       method: req.method,
       ip: req.ip,
@@ -49,6 +50,7 @@ router.get('/single', async (req, res) => {
   } catch (error) {
     Logger.error(
       'error occured in GET /single',
+      req.hostname,
       error
     );
     res.status(500).json({ error: 'unknown error' });
@@ -65,6 +67,7 @@ router.post('/single', async (req, res) => {
   } catch (error) {
     Logger.error(
       'error occured in POST /single',
+      req.hostname,
       error
     );
     res.status(500).json({ error: 'unknown error' });

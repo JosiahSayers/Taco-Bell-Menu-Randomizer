@@ -3,11 +3,11 @@ import { LogStatement } from '../types/log-statement.model';
 const runningTimers: { [timerName: string]: { startTime: number } } = {};
 const logToConsole = () => process.env.LOG_TO_CONSOLE === 'true';
 
-function info(message: string, json?: object): void {
+function info(message: string, hostname: string, json?: object): void {
   sendLogToDatabase(message || '', json || {}, 'info');
 }
 
-function error(message: string, json?: object): void {
+function error(message: string, hostname: string, json?: object): void {
   sendLogToDatabase(message || '', json || {}, 'error');
 }
 

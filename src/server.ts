@@ -39,14 +39,9 @@ app.use((req: Request, res, next) => {
   if (req.path === '/' && req.method === 'GET') {
     Logger.info(
       'Web app was requested',
+      req.hostname,
       {
-        baseUrl: req.baseUrl,
-        path: req.path,
-        url: req.url,
-        originalUrl: req.originalUrl,
-        ip: req.ip,
-        method: req.method,
-        hostname: req.hostname
+        ip: req.ip
       }
     );
   }
