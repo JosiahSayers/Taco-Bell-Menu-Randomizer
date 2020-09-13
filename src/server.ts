@@ -39,7 +39,7 @@ app.use((req: Request, res, next) => {
   if (req.path === '/' && req.method === 'GET') {
     Logger.info(
       'Web app was requested',
-      req.hostname,
+      req.headers.host,
       {
         ip: req.ip
       }

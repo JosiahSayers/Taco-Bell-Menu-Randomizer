@@ -40,7 +40,6 @@ function finishTimerFor(timerName: string): void {
 
 function sendLogToDatabase(message: string, json: object, level: string, hostname?: string): void {
   const logStatement = {
-    time: new Date().toISOString(),
     message,
     json,
     level,
