@@ -1,0 +1,24 @@
+# Your workflow name.
+name: Deploy to heroku.
+
+# Run workflow on every push to master branch.
+on:
+  push:
+    branches: [master]
+
+# Your workflows jobs.
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Check-out your repository.
+      - name: Checkout
+        uses: actions/checkout@v2
+      # Check-out appsettings
+      - name: Checkout appsettings
+        uses: actions/checkout@v2
+        with:
+          repository: JosiahSayers/Taco-Especial
+          path: frontend
+          token: ${{ secrets.GH_ACCESS_TOKEN }}
+      - run: cd frontend && npm i && npm run build
