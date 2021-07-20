@@ -63,7 +63,8 @@ export async function getMenu(): Promise<Menu> {
 }
 
 export async function getRandomItem(menu: Menu, options?: RandomItemParams): Promise<RandomizedProduct> {
-  if (menu) {
+  const cacheEnabled = false;
+  if (menu && cacheEnabled) {
     return getRandomItemFromCache(menu, options);
   } else {
     return getRandomItemFromScraper(options);
