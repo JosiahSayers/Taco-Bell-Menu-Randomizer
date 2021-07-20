@@ -47,8 +47,10 @@ function sendLogToDatabase(message: string, json: object, level: string, hostnam
     hostname
   };
 
-  LogStatement.create(logStatement);
-
+  if (process.env.NODE_ENV === 'production') {
+    LogStatement.create(logStatement);
+  }
+  
   if (logToConsole()) {
     console.log(logStatement);
   }

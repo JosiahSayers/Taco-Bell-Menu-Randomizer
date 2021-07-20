@@ -6,6 +6,7 @@ import { MenuItem } from '../types/menu-item.model';
 import { Menu } from '../types/menu';
 import { RandomItemParams } from '../types/random-item-params.model';
 import { Logger } from './logger.service';
+import { asyncForEach, includesCaseInsensitve } from './helper-functions.server';
 
 const categoriesToSkip = [
   'party packs',
@@ -181,24 +182,3 @@ function getRandom<T>(array: any[]): T {
   }
 }
 
-async function asyncForEach(array: any[], callback: Function) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array);
-  }
-}
-
-function includesCaseInsensitve(array: string[], str: string): boolean {
-  let found = false;
-  if (Array.isArray(array)) {
-    for (let i = 0; i < array.length && !found; i++) {
-      found = stringCompare(array[i], str);
-    }
-  }
-  return found;
-}
-
-function stringCompare(a: string, b: string) {
-  return typeof a === 'string' && typeof b === 'string'
-    ? a.localeCompare(b, undefined, { sensitivity: 'accent' }) === 0
-    : a === b;
-}
