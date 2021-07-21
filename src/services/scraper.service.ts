@@ -44,7 +44,7 @@ export async function getMenuItems(categoryObject: Category): Promise<MenuItem[]
     const href = baseUrl + product.attribs.href;
     const title = product.children[0].data;
 
-    if (stringCompare(category, categoryObject.title)) {
+    if (!includesCaseInsensitve(IGNORED_CATEGORIES, category)) {
       menuItems.push({ href, title, category });
     }
   });
