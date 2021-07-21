@@ -29,7 +29,7 @@ export function getAllPossibleValues(menu: Menu, refresh = false): PossibleItems
 
     if (!doesFileAlreadyExist() || refresh) {
       try {
-        fs.writeFileSync('./menu-possibilites.json', JSON.stringify(possibleItems), { encoding: 'utf8' });
+        fs.writeFileSync('./menu-possibilities.json', JSON.stringify(possibleItems), { encoding: 'utf8' });
       } catch (e) {
         Logger.error('Error writing menu possibilites to disk', undefined, e);
       }
@@ -49,7 +49,7 @@ function addItemIfNew(arr: string[], newItem: string): string[] {
 
 function doesFileAlreadyExist(): boolean {
   try {
-    const file = fs.readFileSync('./menu-possibilites.json', { encoding: 'utf8' });
+    const file = fs.readFileSync('./menu-possibilities.json', { encoding: 'utf8' });
     return !!file;
   } catch (e) {
     Logger.error('Error reading menu possibilities from disk', undefined, e);

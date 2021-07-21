@@ -1,9 +1,12 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
+import { IGNORED_CATEGORIES } from '../constants/menu-filter';
 
 import { Category } from "../types/category.model";
 import { MenuItem } from '../types/menu-item.model';
 import { Product } from '../types/product.model';
+import { includesCaseInsensitve, stringCompare } from './helper-functions.server';
+import { Logger } from './logger.service';
 
 const baseUrl = 'https://tacobell.com';
 const startingUrl = baseUrl + '/food';
@@ -13,14 +16,16 @@ export async function getCategories(): Promise<Category[]> {
 
   const html = response.data;
   const $ = cheerio.load(html);
-  const menuItems = $('a.cls-category-card-item').toArray() || [];
-  const titleItems = $('a.cls-category-card-item > .cls-category-card-item-card > .text > span');
+  const menuItems = $('[class*="menu-tile"] [class*="content"] a').toArray() || [];
+  const titleItems = $('[class*="menu-tile"] [class*="content"] a span[class*="label"]');
   const categories: Category[] = [];
   
   menuItems.forEach((item, index) => {
     const href = baseUrl + item.attribs.href;
     const title = titleItems[index].children[0].data;
-    categories.push({ href, title });
+    if (!includesCaseInsensitve(IGNORED_CATEGORIES, title)) {
+      categories.push({ href, title });
+    }
   });
 
   return categories;
@@ -38,7 +43,10 @@ export async function getMenuItems(categoryObject: Category): Promise<MenuItem[]
     const category = product.attribs.href.split('/')[2];
     const href = baseUrl + product.attribs.href;
     const title = product.children[0].data;
-    menuItems.push({ href, title, category });
+
+    if (!includesCaseInsensitve(IGNORED_CATEGORIES, category)) {
+      menuItems.push({ href, title, category });
+    }
   });
 
   return menuItems;

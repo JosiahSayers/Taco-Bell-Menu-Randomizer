@@ -26,12 +26,14 @@ const injectCache = (req: Express.Request, res: Express.Response, next: Function
   next();
 }
 
-mongoose.connect(MONGO_CONNECTION_STRING, {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false
-});
+if (process.env.NODE_ENV === 'production') {
+  mongoose.connect(MONGO_CONNECTION_STRING, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false
+  });
+}
 
 app.use(injectCache);
 app.use(cors());
