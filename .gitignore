@@ -4,3 +4,5 @@ Archive.zip
 dist
 public
 .DS_Store
+cache.json
+menu-possibilities.json

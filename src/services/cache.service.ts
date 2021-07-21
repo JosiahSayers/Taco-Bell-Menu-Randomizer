@@ -45,7 +45,7 @@ export function getValidMenuFromDisk(): Menu {
 
 export function getMenuPossibilitiesFromDisk(): PossibleItems {
   try {
-    const asString = fs.readFileSync('./menu-possibilites.json', { encoding: 'utf8' });
+    const asString = fs.readFileSync('./menu-possibilities.json', { encoding: 'utf8' });
     const possibleItems = JSON.parse(asString);
     return possibleItems;
   } catch (e) {
